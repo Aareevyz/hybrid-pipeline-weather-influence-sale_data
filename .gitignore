@@ -1,0 +1,5 @@
+#ยกเว้นไฟล์ 
+
+Pipfile
+Pipfile.lock
+.env

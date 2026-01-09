@@ -1,0 +1,21 @@
+id,name,price,category
+P001,Cola,20,Beverage
+P004,Drinking Water 1.5 Litre,15,Beverage
+P008,Instant Cup Nooddle,15,Food
+P019,Cigarette Pack,120,Tobacco
+P003,Ice cream,15,Food
+P006,Beer can,55,Alcohol
+P011,Potato Chips,30,Snack
+P014,Loaf of Bread,35,Food
+P015,Bar Soap,15,Personal Care
+P016,Toothpaste,55,Personal Care
+P002,Electrolyte Drink,25,Beverage
+P005,Roll-on Deodorant,45,Personal Care
+P007,Instant Coffee,10,Beverage
+P009,Cold Medicine,35,Health
+P010,Folding Umbrella,100,Household/Misc
+P012,Mosquito Repellent,65,Household/Misc
+P013,Candle,10,Household/Misc
+P017,Fish Sauce,30,Condiment
+P018,Jasmine Rice 1 Kg,40,Food
+P020,Dishwashing Liquid,30,Cleaning

@@ -1,0 +1,11 @@
+﻿store_id,city,province,latitude,longitude,Region
+S01,Sathorn,Bangkok,13.725,100.52,Central
+S02,Mae Rim,Chiang Mai,18.892,98.98,North
+S03,Hat Yai,Songkhla,7.009,100.47,South
+S04,Muang,Khon Kaen,16.4385,102.833,Northeast
+S05,Sri Racha,Chonburi,13.167,100.95,East
+S06,Hua Hin,Prachuap,12.5681,99.9575,West
+S07,Muang,Ubon Ratchathani,15.225,104.85,Northeast
+S08,Muang,Suratthani,9.135,99.316,South
+S09,Muang,Phitsanulok,16.825,100.26,North
+S10,Rangsit,Pathum Thani,14.0381,100.6152,Central
