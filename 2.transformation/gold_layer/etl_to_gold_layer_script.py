@@ -47,6 +47,15 @@ sales_dyf = glueContext.create_dynamic_frame.from_options(
 weather_df = weather_dyf.toDF()
 sales_df = sales_dyf.toDF()
 
+# Schema Validation for csv file from raw layer
+EXPECTED_COLUMNS = ['transaction_id', 'store_id', 'sale_date', 'product_id', 'product_name', 'units_sold', 'sales_amount']
+actual_columns = sales_df.columns
+
+if actual_columns != EXPECTED_COLUMNS:
+    missing_cols = set(EXPECTED_COLUMNS) - set(actual_columns)
+    extra_cols = set(actual_columns) - set(EXPECTED_COLUMNS)
+    raise ValueError(f"Schema Validation Failed: Expected columns {EXPECTED_COLUMNS}, but got {actual_columns}. Missing: {missing_cols}, Extra: {extra_cols}")
+
 # Transform: Join weather and sales data on store_id and date_key
 
 # Clean and select relevant columns from weather data
