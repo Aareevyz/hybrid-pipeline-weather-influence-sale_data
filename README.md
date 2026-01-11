@@ -1,0 +1,97 @@
+Weather & Sales Data Pipeline (Hybrid Cloud)
+Python AWS Spark PostgreSQL
+
+A robust Hybrid Data Engineering Pipeline that bridges the gap between on-premise data sources and cloud-based processing power. This project demonstrates how to ingest local CSV data, process it using AWS Serverless technologies, and sync the enriched results back to a local PostgreSQL database using an event-driven architecture.
+
+Architecture
+The pipeline follows a Pull-based architecture to solve hybrid connectivity challenges:
+
+
+Key Considerations
+Idempotency: Ingestion script uses MD5 checksums to prevent duplicate uploads.
+Schema Evolution: AWS Glue handles schema checks, and the local exporter dynamically adapts to new columns.
+Security: Uses SQS for signaling, avoiding the need to open local firewall ports for inbound traffic.
+🛠️ Tech Stack
+Language: Python 3.x
+Cloud Provider: AWS
+S3: Data Lake storage (Raw/Silver/Gold layers).
+AWS Glue: Serverless Spark for data transformation and cleaning.
+Amazon SQS: Message queue for decoupling cloud and local processes.
+Step Functions: Workflow orchestration.
+Database: PostgreSQL
+
+Libraries: boto3, pandas, pyspark, sqlalchemy, python-dotenv.
+📂 Project Structure
+📦 de_portfolio_project
+ ┣ 📂 0.data_src             # Mock data generation scripts
+ ┣ 📂 1.ingestion            # Scripts for uploading local data to S3
+ ┣ 📂 2.transformation       # AWS Glue scripts (Silver/Gold layers)
+ ┣ 📂 3.export_to_postgres   # Worker scripts for syncing Cloud -> Local DB
+ ┣ 📜 Orchestration_StepFunction.json  # AWS Step Functions Definition
+ ┗ 📜 Pipfile                # Dependency management
+🔐 IAM Role & Policy Configuration
+
+To ensure smooth operation, configure the following IAM Roles and Policies:
+
+1. Local User (Ingestion & Worker)
+Attach these policies to the IAM User used by your local scripts (via aws configure):
+
+S3 Access: Read/Write access to the weather-influence-on-sales bucket.
+SQS Access: sqs:ReceiveMessage, sqs:DeleteMessage for the worker queue.
+Glue Access (Optional): If triggering crawlers/jobs from local script.
+2. AWS Glue Service Role
+Role: AWSGlueServiceRole
+
+Managed Policy: AWSGlueServiceRole
+Custom Policy (S3 Access):
+{
+    "Effect": "Allow",
+    "Action": ["s3:GetObject", "s3:PutObject", "s3:ListBucket"],
+    "Resource": [
+        "arn:aws:s3:::weather-influence-on-sales",
+        "arn:aws:s3:::weather-influence-on-sales/*"
+    ]
+}
+Custom Policy (SQS Access):
+{
+    "Effect": "Allow",
+    "Action": ["sqs:SendMessage"],
+    "Resource": "arn:aws:sqs:ap-northeast-1:1234567890:my-queue"
+}
+3. Step Functions Role
+Role: StepFunctionsExecutionRole
+
+Policies: Allow execution of Glue Jobs and Sending SQS messages (if applicable).
+🚀 Setup & Installation
+1. Prerequisites
+Python 3.8+ installed.
+AWS CLI configured with appropriate permissions (
+s3
+, glue, 
+sqs
+).
+PostgreSQL installed locally.
+2. Environment Variables
+Create a .env file in the 3.export_to_postgres directory:
+
+SQS_QUEUE_URL=https://sqs.ap-northeast-1.amazonaws.com/1234567890/my-queue
+DB_HOST=localhost
+DB_USER=your_user
+DB_PASSWORD=your_password
+3. Install Dependencies
+pip install boto3 pandas sqlalchemy psycopg2-binary python-dotenv
+# OR using Pipenv
+pipenv install
+🏃‍♂️ Usage
+Generate Data: Run data_set_mockup.py to create fresh sales data.
+Ingest Data: Run 
+raw_data_from_local.py
+ to upload files to S3.
+python 1.ingestion/raw_data_from_local.py
+Run ETL (AWS): Trigger the AWS Glue Job (or Step Function) manually or via scheduler.
+Sync to Local DB: Start the worker to pull results.
+python 3.export_to_postgres/sqs_worker.py
+🔮 Future Improvements
+Containerization: Dockerize the local worker for easier deployment.
+Airflow: Replace custom scripts with Apache Airflow for DAG management.
+Data Quality: Integrate Great Expectations for rigorous testing.
