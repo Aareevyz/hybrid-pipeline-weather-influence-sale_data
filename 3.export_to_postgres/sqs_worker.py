@@ -36,7 +36,7 @@ def poll_sqs_and_export():
         if not messages:
             print("No messages in queue. Waiting...")
             time.sleep(5)
-            continue
+            break   
 
         for msg in messages:
             body = json.loads(msg['Body'])

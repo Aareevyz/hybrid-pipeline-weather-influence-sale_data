@@ -16,8 +16,7 @@ load_dotenv(dotenv_path)
 
 ## 1. Configuration
 # Date for S3 path
-CURRENT_DATE = datetime.now().strftime('%Y-%m-%d')
-
+CURRENT_DATE = '2026-01-06'
 # AWS S3 Configuration
 S3_BUCKET = 'weather-influence-on-sales'
 S3_PREFIX = f'gold/date_key={CURRENT_DATE}/'
