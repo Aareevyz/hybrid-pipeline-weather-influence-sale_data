@@ -13,7 +13,7 @@ A robust **Hybrid Data Engineering Pipeline** that bridges the gap between on-pr
 
 The pipeline follows a **Pull-based** architecture to solve hybrid connectivity challenges:
 
-<img width="1007" height="649" alt="image" src="https://github.com/user-attachments/assets/f404e466-e454-450d-a817-d9150c072fbc" />
+<img width="100%" alt="Pipeline Architecture" src="https://github.com/user-attachments/assets/f404e466-e454-450d-a817-d9150c072fbc" />
 
 ### Key Considerations
 *   **Idempotency**: Ingestion script uses MD5 checksums to prevent duplicate uploads.
@@ -24,14 +24,14 @@ The pipeline follows a **Pull-based** architecture to solve hybrid connectivity 
 
 ## 🛠️ Tech Stack
 
-*   **Language**: Python 3.x
+*   **Language**: Python 3.10+
 *   **Cloud Provider**: AWS
     *   **S3**: Data Lake storage (Raw/Silver/Gold layers).
     *   **AWS Glue**: Serverless Spark for data transformation and cleaning.
     *   **Amazon SQS**: Message queue for decoupling cloud and local processes.
     *   **Step Functions**: Workflow orchestration.
 *   **Database**: PostgreSQL
-*   **Libraries**: `boto3`, `pandas`, `pyspark`, `sqlalchemy`, `python-dotenv`.
+*   **Libraries**: `boto3`, `pandas`, `pyspark`, `sqlalchemy`, `python-dotenv`, `psycopg2-binary`.
 
 ---
 
@@ -48,29 +48,31 @@ The pipeline follows a **Pull-based** architecture to solve hybrid connectivity 
 ```
 
 ---
-## 🔐 IAM Role & Policy Configuration
 
-To ensure smooth operation, configure the following IAM Roles and Policies:
+## 🚀 Setup & Configuration
 
-### 1. Local User (Ingestion & Worker)
+### 1. Prerequisites
+*   Python 3.10+ installed.
+*   AWS CLI configured with appropriate permissions (`s3`, `glue`, `sqs`).
+*   PostgreSQL installed locally.
+
+### 2. IAM Role & Policy Configuration
+To ensure smooth operation, configure the following IAM permissions:
+
+#### A. Local User (Ingestion & Worker)
 Attach these policies to the IAM User used by your local scripts (via `aws configure`):
 *   **S3 Access**: Read/Write access to the `weather-influence-on-sales` bucket.
 *   **SQS Access**: `sqs:ReceiveMessage`, `sqs:DeleteMessage` for the worker queue.
-*   **Glue Access** (Optional): If triggering crawlers/jobs from local script.
 
-### 2. AWS (Cloud) User
-Role: `weather_data_pipeline`
-*   **Managed Policy**: `AWSGlueServiceRole`
-*   **Managed Policy**: `AWSAthenaFullAccess`
+#### B. AWS Glue Service Role
+Role: `AWSGlueServiceRole`
+*   **Managed Policy**: `AWSGlueServiceRole`, `AWSAthenaFullAccess`
 *   **Custom Policy (S3 Access)**:
     ```json
     {
         "Effect": "Allow",
         "Action": ["s3:GetObject", "s3:PutObject", "s3:ListBucket"],
-        "Resource": [
-            "arn:aws:s3:::weather-influence-on-sales",
-            "arn:aws:s3:::weather-influence-on-sales/*"
-        ]
+        "Resource": ["arn:aws:s3:::weather-influence-on-sales", "arn:aws:s3:::weather-influence-on-sales/*"]
     }
     ```
 *   **Custom Policy (SQS Access)**:
@@ -82,30 +84,18 @@ Role: `weather_data_pipeline`
     }
     ```
 
-Additional policies for Lambda Functions
-Lambda Function
-    *   **Lambda1 Function**: Addition 
-        1.'s3:GetObject' policy to the Lambda function.
-    *   **Lambda2 Function**: Addition 
-        1.'s3:PutObject' policy to the Lambda function.
-        2. request library in lambda layer.
-    *   **Lambda3 Function**: Addition 
-        1.'sqs:SendMessage' policy to the Lambda function.
-    
+#### C. Lambda Functions
+*   **Lambda1 (Ingest)**: Needs `s3:GetObject`.
+*   **Lambda2 (Process)**: Needs `s3:PutObject`.
+*   **Lambda3 (Trigger)**: Needs `sqs:SendMessage`, Need to Add 'requests' library in lambda layer.
+
 ### 3. Step Functions Role
 Role: `StepFunctionsExecutionRole`
-*   **Policies**: Allow execution of Glue Jobs and Sending SQS messages (if applicable).
+*   **Policies**: Allow execution of Glue Jobs and Lambda Invoke.
 
----
+## 🏃‍♂️ Installation & Usage
 
-## 🚀 Setup & Installation
-
-### 1. Prerequisites
-*   Python 3.10+ installed.
-*   AWS CLI configured with appropriate permissions (`s3`, `glue`, `sqs`).
-*   PostgreSQL installed locally.
-
-### 2. Environment Variables
+### 1. Environment Setup
 Create a `.env` file in the `3.export_to_postgres` directory:
 ```ini
 SQS_QUEUE_URL=https://sqs.ap-northeast-1.amazonaws.com/1234567890/my-queue
@@ -114,14 +104,12 @@ DB_USER=your_user
 DB_PASSWORD=your_password
 ```
 
-### 3. Install Dependencies
+### 2. Install Dependencies
 ```bash
-pip install boto3 pandas sqlalchemy python-dotenv
+pip install boto3 pandas sqlalchemy psycopg2-binary python-dotenv
 # OR using Pipenv
 pipenv install
 ```
-
----
 
 ## 🏃‍♂️ Usage
 
@@ -131,7 +119,7 @@ pipenv install
     python 1.ingestion/raw_data_from_local.py
     ```
 3.  **Run ETL (AWS)**: Trigger the AWS Glue Job (or Step Function) manually or via scheduler.
-4.  **Sync to Local DB**: Start the worker to pull results.
+4.  **Sync to Local DB**: Run `sqs_worker.py` to pull results from SQS and sync to local DB.
     ```bash
     python 3.export_to_postgres/sqs_worker.py
     ```
