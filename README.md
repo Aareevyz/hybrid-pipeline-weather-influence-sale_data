@@ -38,7 +38,7 @@ The pipeline follows a **Pull-based** architecture to solve hybrid connectivity 
 ## 📂 Project Structure
 
 ```bash
-📦 de_portfolio_project
+📦 Weather & Sales Data Pipeline
  ┣ 📂 0.data_src             # Mock data generation scripts
  ┣ 📂 1.ingestion            # Scripts for uploading local data to S3
  ┣ 📂 2.transformation       # AWS Glue scripts (Silver/Gold layers)
@@ -58,9 +58,10 @@ Attach these policies to the IAM User used by your local scripts (via `aws confi
 *   **SQS Access**: `sqs:ReceiveMessage`, `sqs:DeleteMessage` for the worker queue.
 *   **Glue Access** (Optional): If triggering crawlers/jobs from local script.
 
-### 2. AWS Glue Service Role
-Role: `AWSGlueServiceRole`
+### 2. AWS (Cloud) User
+Role: `weather_data_pipeline`
 *   **Managed Policy**: `AWSGlueServiceRole`
+*   **Managed Policy**: `AWSAthenaFullAccess`
 *   **Custom Policy (S3 Access)**:
     ```json
     {
@@ -81,6 +82,16 @@ Role: `AWSGlueServiceRole`
     }
     ```
 
+Additional policies for Lambda Functions
+Lambda Function
+    *   **Lambda1 Function**: Addition 
+        1.'s3:GetObject' policy to the Lambda function.
+    *   **Lambda2 Function**: Addition 
+        1.'s3:PutObject' policy to the Lambda function.
+        2. request library in lambda layer.
+    *   **Lambda3 Function**: Addition 
+        1.'sqs:SendMessage' policy to the Lambda function.
+    
 ### 3. Step Functions Role
 Role: `StepFunctionsExecutionRole`
 *   **Policies**: Allow execution of Glue Jobs and Sending SQS messages (if applicable).
@@ -90,7 +101,7 @@ Role: `StepFunctionsExecutionRole`
 ## 🚀 Setup & Installation
 
 ### 1. Prerequisites
-*   Python 3.8+ installed.
+*   Python 3.10+ installed.
 *   AWS CLI configured with appropriate permissions (`s3`, `glue`, `sqs`).
 *   PostgreSQL installed locally.
 
@@ -105,7 +116,7 @@ DB_PASSWORD=your_password
 
 ### 3. Install Dependencies
 ```bash
-pip install boto3 pandas sqlalchemy psycopg2-binary python-dotenv
+pip install boto3 pandas sqlalchemy python-dotenv
 # OR using Pipenv
 pipenv install
 ```
