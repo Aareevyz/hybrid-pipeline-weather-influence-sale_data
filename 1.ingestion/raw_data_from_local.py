@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 # --- Configuration ---
 S3_BUCKET_NAME = 'weather-influence-on-sales'  ## Input your S3 Bucket Name here
-DATA_DATE = (datetime.now()+timedelta(days=3)).strftime('%Y-%m-%d')   # Date for partitioning data in S3
+DATA_DATE = datetime.now().strftime('%Y-%m-%d')   # Date for partitioning data in S3
 LOCAL_DIR = './0.data_src'  # Local Directory that contains files to upload
 REGION_NAME = 'ap-northeast-1'  # AWS Region
 

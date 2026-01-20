@@ -7,7 +7,7 @@ import os
 
 # กำหนดเป้าหมายและวันที่
 TARGET_ROWS = 50000
-CURRENT_DATE = (datetime.now() - timedelta(days=4)).replace(hour=0, minute=0, second=0, microsecond=0) # ใช้วันที่ปัจจุบัน
+CURRENT_DATE = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) # ใช้วันที่ปัจจุบัน
 CURRENT_DATE_STR = CURRENT_DATE.strftime("%Y%m%d")
 OUTPUT_FILENAME = f"sales_transaction_data_{CURRENT_DATE_STR}.csv"
 
